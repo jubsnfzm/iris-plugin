@@ -1,0 +1,33 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "iris",
+  "version": "1.0.2",
+  "description": "Set up and run Iris, Flowlith's AI agent for Instagram, WhatsApp, Messenger and website chats: guided onboarding, business Info, lessons, launch, test chats and credits.",
+  "author": {
+    "name": "Flowlith",
+    "url": "https://www.flowlith.com"
+  },
+  "homepage": "https://www.flowlith.com",
+  "repository": "https://github.com/jubsnfzm/iris-plugin",
+  "license": "MIT",
+  "keywords": ["instagram", "whatsapp", "customer-support", "sales", "ai-agent"],
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": false,
+      "onboardingSkill": "./skills/iris-setup/SKILL.md",
+      "interface": {
+        "displayName": "Iris by Flowlith",
+        "shortDescription": "Set up and manage your Iris customer-reply agent.",
+        "developerName": "Flowlith",
+        "category": "Productivity",
+        "capabilities": ["Read", "Write"],
+        "websiteURL": "https://www.flowlith.com",
+        "privacyPolicyURL": "https://www.flowlith.com/privacy",
+        "termsOfServiceURL": "https://www.flowlith.com/terms",
+        "defaultPrompt": ["Set up Iris for my business", "Check my Iris business status"],
+        "composerIcon": "./assets/iris-512.png",
+        "logo": "./assets/iris-512.png"
+      }
+    }
+  }
+}
