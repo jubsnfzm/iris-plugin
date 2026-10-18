@@ -1,0 +1,22 @@
+{
+  "name": "iris",
+  "version": "1.0.2",
+  "description": "Set up and run Iris, Flowlith's AI agent for Instagram, WhatsApp, Messenger and website chats: guided onboarding, business Info, lessons, launch, test chats and credits.",
+  "author": {
+    "name": "Flowlith",
+    "url": "https://www.flowlith.com"
+  },
+  "homepage": "https://www.flowlith.com",
+  "repository": "https://github.com/jubsnfzm/iris-plugin",
+  "license": "MIT",
+  "keywords": [
+    "instagram",
+    "whatsapp",
+    "customer-support",
+    "sales",
+    "ai-agent"
+  ],
+  "icon": "./assets/iris-512.png",
+  "privacyPolicyUrl": "https://www.flowlith.com/privacy",
+  "termsOfServiceUrl": "https://www.flowlith.com/terms"
+}
