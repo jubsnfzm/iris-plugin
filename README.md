@@ -8,6 +8,14 @@ hosted Flowlith MCP service; it does not run a second agent or include the serve
 **Repository:** [jubsnfzm/iris-plugin](https://github.com/jubsnfzm/iris-plugin) ·
 **Client license:** [MIT](LICENSE)
 
+**Latest release:** [v1.1.0](https://github.com/jubsnfzm/iris-plugin/releases/tag/v1.1.0) ·
+**Installable ZIP:** [iris-plugin-1.1.0.zip](https://github.com/jubsnfzm/iris-plugin/releases/download/v1.1.0/iris-plugin-1.1.0.zip)
+
+Version 1.1.0 adds the Teach Iris workflow for Markdown assets, skill attachments,
+secure key-entry links and explicitly approved, revision-bound Apply. Existing
+imported copies may need your client's plugin-update action; publishing this
+release does not automatically refresh an import or approve a marketplace listing.
+
 **MCP URL:** `https://mcp.flowlith.com/mcp` · **Authentication:** browser OAuth
 
 The plugin is free. The separate hosted Iris service requires a Flowlith account;
@@ -111,13 +119,15 @@ Custom, enter the same MCP URL and finish authentication.
 ## Capabilities and browser-only actions
 
 - Set up a business, check status and connect its customer channels.
-- Review/update business Info; interview, preview and save approved skills.
+- Review/update business Info; interview or directly edit skills, attach original documents, and preview/save drafts.
+- Manage Markdown assets and their descriptions; review all pending teaching changes, then explicitly Apply the approved revision.
+- Add/rotate access keys in the secure form opened for that skill; list/remove key names without exposing values.
 - Launch Iris, test a customer question and check credits.
 - Test chats use the currently applied skills, just like the dashboard; saved or
   pending drafts aren't substituted. Each reply uses one credit. If skills change
-  before a test starts, check their status before requesting another test.
+  before a test starts, check their status before requesting another test. Reuse the returned conversation id for follow-ups and the same message id only for a retry.
 - Meta authorization, private account settings, API keys/secrets, customer Memory,
-  file attachments and payments happen on their websites, not inside model prompts.
+  and payments happen on their websites, not inside model prompts. Attachments use original text/base64 bytes supplied by the AI client; if unavailable, use the upload form, never invented file contents.
 - The current hosted server also exposes `buy_credits`, returning a hosted Razorpay
   link for a credit pack or monthly plan. This public client does not remove or
   hide that paid-service capability.

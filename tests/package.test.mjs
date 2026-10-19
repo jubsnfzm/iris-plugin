@@ -95,6 +95,12 @@ test("the existing setup alias uses the single shared skill with approval and pr
   assert.match(docs, /does not.*grant rights to its\nprivate server/);
 });
 
+test("teaching instructions preserve draft isolation, original files and secure key entry", () => {
+  const skill = readFileSync(join(root, "skills/iris-setup/SKILL.md"), "utf8");
+  for (const text of ["get_teaching", "save_asset", "get_asset", "remove_asset", "preview_skill", "apply_teaching", "access_key_names", "data_base64", "skill_id"]) assert(skill.includes(text), text);
+  for (const text of ["untrusted reference data", "Never request or pass the value in chat or tool arguments", "changes a DRAFT only", "show ALL pending changes", "that exact revision", "A stale revision requires a new review and approval", "do not invent original bytes"]) assert(skill.includes(text), text);
+});
+
 test("the copied package works without this repository and regenerates stale adapters", () => {
   const temporary = mkdtempSync(join(tmpdir(), "iris-package-")), copy = join(temporary, "package with spaces");
   try {

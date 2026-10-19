@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "iris",
-  "version": "1.0.2",
-  "description": "Set up and run Iris, Flowlith's AI agent for Instagram, WhatsApp, Messenger and website chats: guided onboarding, business Info, lessons, launch, test chats and credits.",
+  "version": "1.1.0",
+  "description": "Set up and run Iris for Instagram, WhatsApp, Messenger and website chats: onboarding, business Info, Markdown assets, skills, secure access-key setup, explicit teaching Apply, test chats and credits.",
   "author": {
     "name": "Flowlith",
     "url": "https://www.flowlith.com"
