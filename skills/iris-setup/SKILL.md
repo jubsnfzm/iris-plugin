@@ -27,7 +27,7 @@ The Flowlith connection (server id `iris`) does the work; this skill is how to t
    - `remove_skill` also needs confirmation and the reviewed revision. It removes that skill's attachments and keys from the draft, not the live agent until Apply.
    Settings, customer Memory, website API keys, data export and account deletion remain browser-only: use the matching `open_dashboard` link.
 5. Ask before changing anything customers will see: launching, replacing business Info or publishing teaching. Explain that Apply affects the whole business and can briefly pause new replies; it sends no test message.
-6. After launch, offer `test_agent` in `preview` (customer) or `owner` mode. Mention one credit per answered message and that connected tools can change real data. Reuse the returned `conversation_id`, mode and `teaching_revision` for follow-ups. For an uncertain send, retry only when requested, using the SAME `message_id` and exact text; do not create a new id or retry terminal failures. A teaching change requires a fresh conversation/review.
+6. After launch, offer `test_agent` as a customer preview only. Owner-chat mode is not available. Mention one credit per answered message and that connected tools can change real data. Reuse the returned `conversation_id`, mode and `teaching_revision` for follow-ups. For an uncertain send, retry only when requested, using the SAME `message_id` and exact text; do not create a new id or retry terminal failures. A teaching change requires a fresh conversation/review.
 
 Keep replies short and plain. If a tool returns an error, explain it in one sentence and say what to do next.
 

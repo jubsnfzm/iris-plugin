@@ -8,11 +8,12 @@ hosted Flowlith MCP service; it does not run a second agent or include the serve
 **Repository:** [jubsnfzm/iris-plugin](https://github.com/jubsnfzm/iris-plugin) ·
 **Client license:** [MIT](LICENSE)
 
-**Latest release:** [v1.2.0](https://github.com/jubsnfzm/iris-plugin/releases/tag/v1.2.0) ·
-**Installable ZIP:** [iris-plugin-1.2.0.zip](https://github.com/jubsnfzm/iris-plugin/releases/download/v1.2.0/iris-plugin-1.2.0.zip)
+**Latest release:** [v1.2.1](https://github.com/jubsnfzm/iris-plugin/releases/tag/v1.2.1) ·
+**Installable ZIP:** [iris-plugin-1.2.1.zip](https://github.com/jubsnfzm/iris-plugin/releases/download/v1.2.1/iris-plugin-1.2.1.zip)
 
-Version 1.2.0 renames the app to Flowlith, shows the credit balance only, and
-adds Actions setup: connect your own systems, enter keys through
+Version 1.2.1 makes `test_agent` a customer preview only; owner-chat mode is retired.
+Version 1.2.0 renamed the app to Flowlith, showed the credit balance only, and
+added Actions setup: connect your own systems, enter keys through
 a one-time secure link, Test, then turn on the exact approved version. Existing
 imported copies may need your client's plugin-update action; publishing this
 release does not automatically refresh an import or approve a marketplace listing.

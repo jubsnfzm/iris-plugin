@@ -177,3 +177,10 @@ test("public instructions have no commerce flow, name the connection Flowlith an
   assert.match(docs, /Reviewer password\nsign-in/);
   assert.match(skill, /get_credits/);
 });
+
+test("the shared setup skill offers only Customer preview, not owner-chat mode", () => {
+  const skill = readFileSync(join(root, "skills/iris-setup/SKILL.md"), "utf8");
+  assert.match(skill, /offer `test_agent` as a customer preview only/);
+  assert.doesNotMatch(skill, /`owner` mode|preview.*or.*owner.*mode/);
+  assert.match(skill, /SAME `message_id` and exact text/);
+});
