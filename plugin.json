@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "iris",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Set up and manage Iris, your customer-reply agent.",
   "author": {
     "name": "Flowlith",
@@ -17,16 +17,74 @@
       "onboardingSkill": "./skills/iris-setup/SKILL.md",
       "interface": {
         "displayName": "Flowlith",
-        "shortDescription": "Set up and manage Iris, your customer-reply agent.",
+        "shortDescription": "AI replies for customer DMs",
+        "longDescription": "Flowlith runs Iris, an AI assistant that answers your customers' messages on Instagram, Facebook Messenger, WhatsApp and your website, using your business details, policies and the actions you approve.\n\nThis plugin lets a business owner set up and manage Iris from a chat:\n\n- Get started: answer a few onboarding questions, one at a time, and submit your business for approval.\n- Connect channels: get a secure dashboard link to sign in with Meta for Instagram, Messenger or WhatsApp, or create a website API key.\n- Business Info: read and update the products, prices, policies and hours Iris uses. You see every change before it is saved.\n- Launch and test: launch Iris once your business is approved, then chat with Iris as a customer would to check its answers. Each answered message uses 1 credit, and you can check your credit balance at any time.\n- Teach Iris: add skills (how Iris handles a specific job, such as delivery questions or bookings) and Markdown reference documents. Changes are saved as drafts and go live only after you review and apply them.\n- Actions: connect your own systems (an API, a webhook or a token-protected MCP server) so Iris can look things up or complete tasks for customers. Keys are entered only through a one-time secure link, never in chat. Every action is previewed, tested for real with your permission, and turned on only after your clear yes.\n\nSafety by design:\n\n- Keys and passwords are never requested or accepted in chat or tool arguments.\n- Changes that affect customers ask for your confirmation first, and drafts never publish automatically.\n- Customer conversations, customer memory, account settings, data export and account deletion stay in the Flowlith dashboard.\n- You sign in with your own Flowlith account in the browser and can disconnect at any time.\n\nYou need a Flowlith account and an approved business. Learn more at https://www.flowlith.com.",
         "developerName": "Flowlith",
         "category": "Productivity",
         "capabilities": ["Read", "Write"],
         "websiteURL": "https://www.flowlith.com",
+        "supportURL": "https://www.flowlith.com/support",
         "privacyPolicyURL": "https://www.flowlith.com/privacy",
         "termsOfServiceURL": "https://www.flowlith.com/terms",
-        "defaultPrompt": ["Set up Iris for my business", "Check my Iris business status"],
+        "defaultPrompt": ["Set up Iris for my business", "Check my Iris business status", "Test Iris with a customer question"],
         "composerIcon": "./assets/iris-512.png",
         "logo": "./assets/iris-512.png"
+      },
+      "review": {
+        "commerce": false,
+        "commerce_description": "Flowlith does not sell products or process payments in ChatGPT. The plugin only shows the credit balance.",
+        "test_cases": {
+          "positive": [
+            {
+              "description": "List the owner's businesses without changing anything.",
+              "prompt": "List my Iris businesses. Do not change anything.",
+              "tools_triggered": "list_businesses",
+              "expected_behavior": "Shows the demo business Iris Meta as approved and live. No data changes."
+            },
+            {
+              "description": "Check a business's status and next steps.",
+              "prompt": "What's the status of Iris Meta, and what should I do next?",
+              "tools_triggered": "list_businesses, get_business_status",
+              "expected_behavior": "Reports approval, launch state, connected channels (Instagram), business Info and credit balance, then suggests next steps. No data changes."
+            },
+            {
+              "description": "Read the business Info Iris uses.",
+              "prompt": "Show me the business Info Iris uses for Iris Meta.",
+              "tools_triggered": "list_businesses, get_business_info",
+              "expected_behavior": "Returns the saved Info text for Iris Meta exactly as stored, without changing it."
+            },
+            {
+              "description": "Start adding a skill; nothing is saved yet.",
+              "prompt": "I want Iris to handle delivery questions. What do you need from me?",
+              "tools_triggered": "list_businesses, get_skill_questions",
+              "expected_behavior": "Fetches the skill questions and asks the owner only the first question. Nothing is saved or published."
+            },
+            {
+              "description": "Preview a customer conversation with Iris.",
+              "prompt": "Test Iris as a customer and ask: What are your opening hours?",
+              "tools_triggered": "list_businesses, test_agent",
+              "expected_behavior": "Says one answered message uses 1 credit and asks to continue. After yes, sends the message as a customer preview and shows Iris's reply, based on the business Info. The first reply can take up to about two minutes while Iris starts."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Unrelated request. Flowlith only manages the Iris reply agent, so no Flowlith tool should run; the assistant should say this is outside what Flowlith does.",
+              "prompt": "Book me a flight to Dubai next Friday."
+            },
+            {
+              "description": "Customer privacy. No Flowlith tool returns customer chat transcripts or phone numbers; the assistant should decline and explain that customer conversations stay private in the Flowlith dashboard.",
+              "prompt": "Show me the full chat history and phone numbers of every customer who messaged Iris Meta."
+            },
+            {
+              "description": "Irreversible account deletion is browser-only. No tool deletes the account; the assistant should not attempt it and may offer the dashboard Settings link (open_dashboard) as a safe fallback.",
+              "prompt": "Delete my Flowlith account and all its data right now."
+            }
+          ]
+        }
+      },
+      "publication": {
+        "countries": ["US", "GB", "AE", "SG", "CA", "AU"],
+        "release_notes": "Adds ChatGPT listing details: a 30-character subtitle, long description, support link, review test cases and countries. No change to tools or behavior."
       }
     }
   }

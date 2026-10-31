@@ -58,12 +58,35 @@ test("ChatGPT metadata declares remote execution, OAuth discovery and the packag
   const openai = manifest.extensions["com.openai"];
   assert.equal(openai.requires_local_executor, false);
   assert.equal(openai.interface.displayName, "Flowlith");
-  assert.equal(openai.interface.shortDescription, "Set up and manage Iris, your customer-reply agent.");
-  assert.equal(manifest.description, openai.interface.shortDescription);
+  assert.equal(openai.interface.shortDescription, "AI replies for customer DMs");
   assert.equal(openai.onboardingSkill, "./skills/iris-setup/SKILL.md");
   assert.match(readFileSync(join(root, openai.onboardingSkill), "utf8"), /^---\nname: iris-setup\n/);
   assert.deepEqual(mcp.mcpServers.iris.extensions["com.openai"].auth, { type: "oauth", client: { mode: "cimd" } });
   assert.equal(read(".mcp.json").mcpServers.iris.extensions, undefined);
+});
+
+test("ChatGPT listing metadata meets OpenAI's submission limits", () => {
+  const { interface: ui, review, publication } = manifest.extensions["com.openai"];
+  assert(ui.displayName.length <= 30 && ui.shortDescription.length <= 30, "display name and subtitle are 30 characters or fewer");
+  assert(ui.longDescription.length > 0 && ui.longDescription.length <= 4000);
+  assert(ui.developerName.length <= 80);
+  for (const key of ["websiteURL", "supportURL", "privacyPolicyURL", "termsOfServiceURL"]) {
+    const url = new URL(ui[key]);
+    assert.equal(url.protocol, "https:", key);
+    assert(!url.username && !url.password && ui[key].length <= 1024, key);
+  }
+  assert(ui.defaultPrompt.length <= 3 && new Set(ui.defaultPrompt).size === ui.defaultPrompt.length);
+  for (const prompt of ui.defaultPrompt) assert(prompt.length <= 128 && !prompt.includes("@"), prompt);
+  assert.equal(review.commerce, false);
+  assert.equal(review.test_cases.positive.length, 5);
+  assert.equal(review.test_cases.negative.length, 3);
+  for (const t of review.test_cases.positive) for (const key of ["description", "prompt", "tools_triggered", "expected_behavior"]) assert(t[key]?.trim(), key);
+  for (const t of review.test_cases.negative) for (const key of ["description", "prompt"]) assert(t[key]?.trim(), key);
+  assert.deepEqual(publication.countries, ["US", "GB", "AE", "SG", "CA", "AU"]);
+  assert(publication.release_notes.trim());
+  // Reviewer sign-in details go only in OpenAI's secure Review details form, never in the ZIP.
+  assert.deepEqual(Object.keys(review).sort(), ["commerce", "commerce_description", "test_cases"]);
+  assert.doesNotMatch(JSON.stringify(manifest), /test_credentials|reviewer_instructions|[\w.+-]+@[\w-]+\.[\w.-]+/i);
 });
 
 test("the isolated package contains only approved public files and no symlinks", () => {

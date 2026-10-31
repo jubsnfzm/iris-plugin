@@ -8,10 +8,11 @@ hosted Flowlith MCP service; it does not run a second agent or include the serve
 **Repository:** [jubsnfzm/iris-plugin](https://github.com/jubsnfzm/iris-plugin) ·
 **Client license:** [MIT](LICENSE)
 
-**Latest release:** [v1.2.1](https://github.com/jubsnfzm/iris-plugin/releases/tag/v1.2.1) ·
-**Installable ZIP:** [iris-plugin-1.2.1.zip](https://github.com/jubsnfzm/iris-plugin/releases/download/v1.2.1/iris-plugin-1.2.1.zip)
+**Latest release:** [v1.2.2](https://github.com/jubsnfzm/iris-plugin/releases/tag/v1.2.2) ·
+**Installable ZIP:** [iris-plugin-1.2.2.zip](https://github.com/jubsnfzm/iris-plugin/releases/download/v1.2.2/iris-plugin-1.2.2.zip)
 
-Version 1.2.1 makes `test_agent` a customer preview only; owner-chat mode is retired.
+Version 1.2.2 adds ChatGPT listing details (subtitle, long description, support link,
+review test cases and countries). Version 1.2.1 made `test_agent` a customer preview only.
 Version 1.2.0 renamed the app to Flowlith, showed the credit balance only, and
 added Actions setup: connect your own systems, enter keys through
 a one-time secure link, Test, then turn on the exact approved version. Existing
