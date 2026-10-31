@@ -17,7 +17,7 @@ const files = {
   },
   ".mcp.json": {
     mcpServers: Object.fromEntries(Object.entries(mcpServers).map(([name, { extensions, ...server }]) => {
-      assert.equal(server.type, "streamable-http", "The shared Iris server must use Streamable HTTP");
+      assert.equal(server.type, "streamable-http", "The shared Flowlith server must use Streamable HTTP");
       return [name, { ...server, type: "http" }];
     })),
   },
@@ -30,4 +30,4 @@ for (const [name, data] of Object.entries(files)) {
     writeFileSync(path, content);
   }
 }
-console.log(process.argv[2] ? "Iris compatibility files verified" : "Iris compatibility files synchronized");
+console.log(process.argv[2] ? "Flowlith compatibility files verified" : "Flowlith compatibility files synchronized");

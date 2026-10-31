@@ -57,6 +57,9 @@ test("Claude compatibility files exactly match the canonical metadata and endpoi
 test("ChatGPT metadata declares remote execution, OAuth discovery and the packaged setup skill", () => {
   const openai = manifest.extensions["com.openai"];
   assert.equal(openai.requires_local_executor, false);
+  assert.equal(openai.interface.displayName, "Flowlith");
+  assert.equal(openai.interface.shortDescription, "Set up and manage Iris, your customer-reply agent.");
+  assert.equal(manifest.description, openai.interface.shortDescription);
   assert.equal(openai.onboardingSkill, "./skills/iris-setup/SKILL.md");
   assert.match(readFileSync(join(root, openai.onboardingSkill), "utf8"), /^---\nname: iris-setup\n/);
   assert.deepEqual(mcp.mcpServers.iris.extensions["com.openai"].auth, { type: "oauth", client: { mode: "cimd" } });
@@ -88,10 +91,10 @@ test("the existing setup alias uses the single shared skill with approval and pr
   assert.match(readFileSync(join(root, "commands/setup.md"), "utf8"), /Follow the iris-setup skill/);
   const docs = readFileSync(join(root, "README.md"), "utf8");
   for (const client of ["Claude", "ChatGPT", "Grok Bot", "Cursor"]) assert(docs.includes(client), client);
-  assert.match(docs, /not ready for ChatGPT public-directory submission/);
+  assert.match(docs, /former commerce blocker is resolved/);
   assert.match(docs, /MIT License/);
   assert.match(docs, /Grok Bot only/);
-  assert.match(docs, /separate paid-credit service/);
+  assert.match(docs, /login email and password/);
   assert.match(docs, /does not.*grant rights to its\nprivate server/);
 });
 
@@ -153,4 +156,24 @@ test("public clone checks reject extra private files, symlinks and a truncated l
   } finally {
     rmSync(temporary, { recursive: true, force: true });
   }
+});
+
+test("Connect keeps keys in one-time phone-friendly links and requires a real Test and exact-version yes", () => {
+  const skill=readFileSync(join(root,"skills/iris-setup/SKILL.md"),"utf8"),docs=readFileSync(join(root,"README.md"),"utf8");
+  for(const text of ["get_key_link","save_action_draft","preview_action","real_write_ok: true","owner_said_yes: true","turn_off_action","rotate","one-click sign-in"])assert(skill.includes(text),text);
+  for(const text of ["<!-- connect-prompt -->","<!-- connect-steps:claude -->","<!-- connect-steps:chatgpt -->","<!-- connect-steps:grok -->","<!-- connect-steps:cursor -->","No verified one-time Codex setup steps","get_key_link","Test is real"])assert(docs.includes(text),text);
+  for(const text of ["phone or computer","no sign-in","15 minutes","fresh link"]){assert(skill.includes(text),text);assert(docs.includes(text),text);}
+  assert(!/laptop or desktop computer|doesn't work on phones/.test(skill+docs));
+  assert(!/Authorization:\s*Bearer\s+(?!\$)[A-Za-z0-9_-]{12,}/i.test(docs));
+});
+
+test("public instructions have no commerce flow, name the connection Flowlith and keep private reviewer configuration out", () => {
+  const docs = readFileSync(join(root, "README.md"), "utf8");
+  const skill = readFileSync(join(root, "skills/iris-setup/SKILL.md"), "utf8");
+  const surfaces = docs + skill + JSON.stringify(manifest) + readFileSync(join(root, "commands/setup.md"), "utf8");
+  assert.doesNotMatch(surfaces, /buy_credits|buy(?:ing)? credits|purchase|upgrade|paid-credit|monthly plan|rzp\.io|section=billing|\/billing|REVIEWER_LOGIN_|portal_access|iris-website/);
+  assert.match(docs, /name it \*\*Flowlith\*\*/);
+  assert.match(docs, /MCP server called Flowlith/);
+  assert.match(docs, /Reviewer password\nsign-in/);
+  assert.match(skill, /get_credits/);
 });
