@@ -8,11 +8,13 @@ hosted Flowlith MCP service; it does not run a second agent or include the serve
 **Repository:** [jubsnfzm/iris-plugin](https://github.com/jubsnfzm/iris-plugin) ·
 **Client license:** [MIT](LICENSE)
 
-**Latest release:** [v1.2.2](https://github.com/jubsnfzm/iris-plugin/releases/tag/v1.2.2) ·
-**Installable ZIP:** [iris-plugin-1.2.2.zip](https://github.com/jubsnfzm/iris-plugin/releases/download/v1.2.2/iris-plugin-1.2.2.zip)
+**Latest release:** [v1.2.3](https://github.com/jubsnfzm/iris-plugin/releases/tag/v1.2.3) ·
+**Installable ZIP:** [iris-plugin-1.2.3.zip](https://github.com/jubsnfzm/iris-plugin/releases/download/v1.2.3/iris-plugin-1.2.3.zip)
 
-Version 1.2.2 adds ChatGPT listing details (subtitle, long description, support link,
-review test cases and countries). Version 1.2.1 made `test_agent` a customer preview only.
+Version 1.2.3 asks for explicit permission before each paid customer preview, keeps
+read-only requests read-only, improves the review cases and explains in the setup
+skill that launching waits for Flowlith approval. Version 1.2.2 added
+listing details and review cases. Version 1.2.1 made `test_agent` a customer preview only.
 Version 1.2.0 renamed the app to Flowlith, showed the credit balance only, and
 added Actions setup: connect your own systems, enter keys through
 a one-time secure link, Test, then turn on the exact approved version. Existing
@@ -58,8 +60,7 @@ is not copied into Claude's generated transport file.
 ## Connect
 
 All clients use the same Flowlith browser sign-in: enter your email, enter the
-email code on the website, then choose Allow. Approved reviewers can instead
-use the restricted password option described below. Never paste a password, login code,
+email code on the website, then choose Allow. Never paste a password, login code,
 session token, card number or UPI PIN into chat or plugin configuration.
 After connecting, say **"Set up Iris for my business"**. MCP cannot start a chat
 by itself. Iris asks one onboarding question at a time and saves each answer.
@@ -78,7 +79,7 @@ For a read-only connection check, ask **"List my Iris businesses. Do not change
 anything."** An empty list is valid for a new account. If authorization has been
 revoked or expired, reconnect in the app and complete browser sign-in again.
 
-The current marketplace submission target is **Grok Bot only**, not the separate
+An earlier marketplace submission targeted **Grok Bot only**, not the separate
 Grok chatbot or Cursor marketplace. Public source and a working custom connection
 do not imply marketplace approval.
 
@@ -181,21 +182,15 @@ one-click sign-in is coming later. Directory publication is separate.
 
 ## Publishing is separate from packaging
 
-The former commerce blocker is resolved in the current implementation. The
-plugin has balance-only credit status and no transactions or billing links.
-Packaging and local checks are **not directory approval**: release the matching
-hosted implementation and updated public package separately, then refresh imports
-and test each target app before submission. Previously published downloads or
-imports may predate these updates.
+Server-side commerce checks remain required. The intended plugin experience has
+balance-only credit status and no transactions or billing links. A package ZIP
+cannot remove promotional text returned by a hosted server. Packaging and local
+checks are **not directory approval**: verify the matching hosted implementation,
+refresh imports and test the target app before submission.
 
-Reviewers need a **login email and password** for an isolated, fully featured demo
-account with sample business Info, skills/assets, safe test systems and enough
-access to exercise all listed capabilities. Use the browser's **Reviewer password
-sign-in** option, then choose **Allow** on the normal consent screen. Do not require
-an inbox code, 2FA or an inaccessible extra step. Put credentials only in the
-platform's secure reviewer fields, never in this package, chat, a prompt or a URL.
-The service operator enables this restricted reviewer path separately; normal
-email-code sign-in is unchanged.
+Use an isolated demo business with sample data and safe test systems to exercise
+the advertised capabilities without affecting live customers. Reviewer access
+belongs only in the platform's secure review fields, never this public package.
 
 Provide working sign-in instructions, example prompts and a demo recording. Use
 the existing logo; review the actual privacy/terms content at the links below and

@@ -67,6 +67,12 @@ test("ChatGPT metadata declares remote execution, OAuth discovery and the packag
 
 test("ChatGPT listing metadata meets OpenAI's submission limits", () => {
   const { interface: ui, review, publication } = manifest.extensions["com.openai"];
+  const categories = ["Business & Operations", "Communication", "Creativity", "Data & Analytics", "Developer Tools", "Education & Research", "Entertainment", "Finance", "Healthcare", "Other", "Productivity", "Scientific Research", "Security", "Travel"];
+  assert(categories.includes(ui.category), "Use a supported category title");
+  for (const key of ["displayName", "shortDescription", "developerName"]) {
+    assert(typeof ui[key] === "string" && ui[key].trim(), key);
+    assert.doesNotMatch(ui[key], /[\p{Cc}\p{Cf}\u2028\u2029]/u, key);
+  }
   assert(ui.displayName.length <= 30 && ui.shortDescription.length <= 30, "display name and subtitle are 30 characters or fewer");
   assert(ui.longDescription.length > 0 && ui.longDescription.length <= 4000);
   assert(ui.developerName.length <= 80);
@@ -76,7 +82,19 @@ test("ChatGPT listing metadata meets OpenAI's submission limits", () => {
     assert(!url.username && !url.password && ui[key].length <= 1024, key);
   }
   assert(ui.defaultPrompt.length <= 3 && new Set(ui.defaultPrompt).size === ui.defaultPrompt.length);
-  for (const prompt of ui.defaultPrompt) assert(prompt.length <= 128 && !prompt.includes("@"), prompt);
+  const normalized = ui.defaultPrompt.map(prompt => prompt.normalize("NFKC").trim().replace(/\s+/gu, " "));
+  assert.equal(new Set(normalized).size, normalized.length, "Starter prompts must be unique after normalization");
+  for (const prompt of ui.defaultPrompt) {
+    assert(prompt.trim() && prompt.length <= 128 && !prompt.includes("@"), prompt);
+    assert.doesNotMatch(prompt, /[\p{Cc}\p{Cf}\u2028\u2029]/u);
+  }
+  for (const key of ["logo", "composerIcon"]) {
+    assert.match(ui[key], /^\.\/assets\/[\w.-]+\.png$/);
+    const icon = readFileSync(join(root, ui[key]));
+    assert(icon.length <= 5 * 1024 * 1024);
+    assert.equal(icon.readUInt32BE(16), icon.readUInt32BE(20), "Square icon required");
+    assert(icon.readUInt32BE(16) >= (key === "logo" ? 256 : 48) && icon.readUInt32BE(16) <= 4096);
+  }
   assert.equal(review.commerce, false);
   assert.equal(review.test_cases.positive.length, 5);
   assert.equal(review.test_cases.negative.length, 3);
@@ -85,7 +103,12 @@ test("ChatGPT listing metadata meets OpenAI's submission limits", () => {
   assert.deepEqual(publication.countries, ["US", "GB", "AE", "SG", "CA", "AU"]);
   assert(publication.release_notes.trim());
   // Reviewer sign-in details go only in OpenAI's secure Review details form, never in the ZIP.
-  assert.deepEqual(Object.keys(review).sort(), ["commerce", "commerce_description", "test_cases"]);
+  for (const key of Object.keys(review)) assert(["commerce", "commerce_description", "test_cases", "demo_recording_url"].includes(key), key);
+  if (review.demo_recording_url !== undefined) {
+    const demo = new URL(review.demo_recording_url);
+    assert.equal(demo.protocol, "https:");
+    assert(!demo.username && !demo.password);
+  }
   assert.doesNotMatch(JSON.stringify(manifest), /test_credentials|reviewer_instructions|[\w.+-]+@[\w-]+\.[\w.-]+/i);
 });
 
@@ -114,10 +137,10 @@ test("the existing setup alias uses the single shared skill with approval and pr
   assert.match(readFileSync(join(root, "commands/setup.md"), "utf8"), /Follow the iris-setup skill/);
   const docs = readFileSync(join(root, "README.md"), "utf8");
   for (const client of ["Claude", "ChatGPT", "Grok Bot", "Cursor"]) assert(docs.includes(client), client);
-  assert.match(docs, /former commerce blocker is resolved/);
+  assert.match(docs, /Server-side commerce checks remain required/);
   assert.match(docs, /MIT License/);
   assert.match(docs, /Grok Bot only/);
-  assert.match(docs, /login email and password/);
+  assert.match(docs, /platform's secure review fields/);
   assert.match(docs, /does not.*grant rights to its\nprivate server/);
 });
 
@@ -193,17 +216,58 @@ test("Connect keeps keys in one-time phone-friendly links and requires a real Te
 test("public instructions have no commerce flow, name the connection Flowlith and keep private reviewer configuration out", () => {
   const docs = readFileSync(join(root, "README.md"), "utf8");
   const skill = readFileSync(join(root, "skills/iris-setup/SKILL.md"), "utf8");
-  const surfaces = docs + skill + JSON.stringify(manifest) + readFileSync(join(root, "commands/setup.md"), "utf8");
+  const surfaces = docs + skill + JSON.stringify(manifest.extensions["com.openai"].interface) + readFileSync(join(root, "commands/setup.md"), "utf8");
   assert.doesNotMatch(surfaces, /buy_credits|buy(?:ing)? credits|purchase|upgrade|paid-credit|monthly plan|rzp\.io|section=billing|\/billing|REVIEWER_LOGIN_|portal_access|iris-website/);
   assert.match(docs, /name it \*\*Flowlith\*\*/);
   assert.match(docs, /MCP server called Flowlith/);
-  assert.match(docs, /Reviewer password\nsign-in/);
+  assert.doesNotMatch(docs, /Reviewer password\nsign-in/);
   assert.match(skill, /get_credits/);
+});
+
+test("the setup skill explains what Flowlith does and that launch waits for Flowlith approval", () => {
+  const skill = readFileSync(join(root, "skills/iris-setup/SKILL.md"), "utf8");
+  assert.match(skill, /## About Flowlith/);
+  assert.match(skill, /`launch_agent` works only after approval/);
+  assert.match(skill, /emails the owner when it is approved/);
+  assert.match(skill, /does not sell credits or take payments/);
 });
 
 test("the shared setup skill offers only Customer preview, not owner-chat mode", () => {
   const skill = readFileSync(join(root, "skills/iris-setup/SKILL.md"), "utf8");
   assert.match(skill, /offer `test_agent` as a customer preview only/);
-  assert.doesNotMatch(skill, /`owner` mode|preview.*or.*owner.*mode/);
+  assert.doesNotMatch(skill, /`owner` mode|preview\s+or\s+owner(?:-chat)?\s+mode/);
+  assert.match(skill, /Owner-chat mode is not available/);
   assert.match(skill, /SAME `message_id` and exact text/);
+});
+
+test("submission guidance gates previews and does not turn read-only requests into setup", () => {
+  const skill = readFileSync(join(root, "skills/iris-setup/SKILL.md"), "utf8");
+  assert.match(skill, /For read-only requests, perform only the requested reads/);
+  assert.match(skill, /wait for the owner's explicit permission before calling `test_agent`/);
+  const { review } = manifest.extensions["com.openai"];
+  assert.match(review.test_cases.positive[4].description, /no live customer channels/);
+  assert.match(review.test_cases.positive[4].expected_behavior, /waits for an explicit yes/);
+  assert.match(review.test_cases.negative[0].description, /Unsupported digital-credit sale/);
+});
+
+test("listing checks reject unsupported categories, duplicate prompts and nonsquare icons", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "iris-listing-")), copy = join(temporary, "iris");
+  try {
+    cpSync(root, copy, { recursive: true });
+    const edited = structuredClone(manifest), ui = edited.extensions["com.openai"].interface;
+    const save = () => writeFileSync(join(copy, "plugin.json"), JSON.stringify(edited));
+    ui.category = "Business"; save();
+    assert.equal(runTest(copy, "^ChatGPT listing metadata").status, 1);
+    ui.category = manifest.extensions["com.openai"].interface.category;
+    ui.defaultPrompt = ["Check Iris", " Check   Iris "]; save();
+    assert.equal(runTest(copy, "^ChatGPT listing metadata").status, 1);
+    ui.defaultPrompt = manifest.extensions["com.openai"].interface.defaultPrompt; save();
+    const icon = readFileSync(join(copy, ui.logo));
+    icon.writeUInt32BE(128, 20); writeFileSync(join(copy, ui.logo), icon);
+    assert.equal(runTest(copy, "^ChatGPT listing metadata").status, 1);
+    cpSync(join(root, ui.logo), join(copy, ui.logo));
+    assert.equal(runTest(copy, "^ChatGPT listing metadata").status, 0);
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
 });
